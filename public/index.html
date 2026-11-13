@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReAlimenta — Plataforma de Redistribuição de Excedentes Alimentares</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topo">
+    <div class="topo__marca">
+      <span class="topo__logo">RA</span>
+      <div>
+        <h1>ReAlimenta</h1>
+        <p>Plataforma de Redistribuição de Excedentes Alimentares · ODS 2 e ODS 12</p>
+      </div>
+    </div>
+    <div class="topo__status" id="statusConexao">
+      <span class="ponto"></span> Conectado ao PostgreSQL
+    </div>
+  </header>
+
+  <nav class="abas" id="abas">
+    <button class="aba aba--ativa" data-aba="painel">Painel de impacto</button>
+    <button class="aba" data-aba="doacoes">Doações</button>
+    <button class="aba" data-aba="doadores">Estabelecimentos doadores</button>
+    <button class="aba" data-aba="receptoras">Organizações receptoras</button>
+    <button class="aba" data-aba="notificacoes">Notificações</button>
+  </nav>
+
+  <main>
+    <!-- ------------------------------------------------ PAINEL -->
+    <section class="secao secao--ativa" id="secao-painel">
+      <div class="cartoes" id="cartoesImpacto"></div>
+
+      <div class="painel">
+        <h2>Participantes cadastrados <small>(demonstração de polimorfismo)</small></h2>
+        <p class="ajuda">
+          A lista abaixo vem de uma única consulta à superclasse <code>Participante</code>.
+          As colunas <strong>Classe</strong>, <strong>Papel</strong> e <strong>Descrição</strong> são
+          produzidas por métodos sobrescritos (<code>override</code>) em cada subclasse —
+          o backend não usa nenhum <code>if</code> para decidir o texto.
+        </p>
+        <div id="tabelaPolimorfismo"></div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ DOACOES -->
+    <section class="secao" id="secao-doacoes">
+      <div class="grade">
+        <div class="painel">
+          <h2 id="tituloFormDoacao">Publicar doação <small>(REQ04)</small></h2>
+          <form id="formDoacao" class="formulario">
+            <input type="hidden" id="doacaoId" />
+            <label>Estabelecimento doador
+              <select id="doacaoDoador" required></select>
+            </label>
+            <label>Tipo de alimento
+              <input id="doacaoTipo" required minlength="3" maxlength="120" placeholder="Ex.: Marmitas prontas" />
+            </label>
+            <label>Descrição
+              <input id="doacaoDescricao" maxlength="255" placeholder="Ex.: Excedente do almoço, refrigerado" />
+            </label>
+            <label>Quantidade estimada (kg)
+              <input id="doacaoQuantidade" type="number" step="0.1" min="0.1" required />
+            </label>
+            <label>Validade do alimento
+              <input id="doacaoValidade" type="datetime-local" required />
+            </label>
+            <label>Horário-limite de retirada
+              <input id="doacaoLimite" type="datetime-local" required />
+            </label>
+            <label>Local de retirada
+              <input id="doacaoLocal" required minlength="5" maxlength="200" />
+            </label>
+            <div class="dupla">
+              <label>Latitude
+                <input id="doacaoLat" type="number" step="0.0001" required />
+              </label>
+              <label>Longitude
+                <input id="doacaoLon" type="number" step="0.0001" required />
+              </label>
+            </div>
+            <div class="acoes-form">
+              <button type="submit" class="botao botao--primario" id="btnSalvarDoacao">Publicar doação</button>
+              <button type="button" class="botao" id="btnCancelarEdicao" hidden>Cancelar edição</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="painel">
+          <div class="painel__cabecalho">
+            <h2>Doações cadastradas <small>(CRUD completo)</small></h2>
+            <select id="filtroStatus" class="filtro">
+              <option value="">Todos os status</option>
+              <option value="DISPONIVEL">Disponível</option>
+              <option value="RESERVADA">Reservada</option>
+              <option value="RETIRADA">Retirada</option>
+              <option value="EXPIRADA">Expirada</option>
+              <option value="CANCELADA">Cancelada</option>
+            </select>
+          </div>
+          <div id="listaDoacoes"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ DOADORES -->
+    <section class="secao" id="secao-doadores">
+      <div class="grade">
+        <div class="painel">
+          <h2>Cadastrar estabelecimento doador <small>(REQ01)</small></h2>
+          <form id="formDoador" class="formulario">
+            <label>Nome <input id="doadorNome" required minlength="3" maxlength="120" /></label>
+            <label>CNPJ <input id="doadorCnpj" required minlength="14" maxlength="18" placeholder="00.000.000/0001-00" /></label>
+            <label>E-mail <input id="doadorEmail" type="email" required /></label>
+            <label>Telefone <input id="doadorTelefone" required minlength="8" maxlength="20" placeholder="(44) 3000-0000" /></label>
+            <label>Endereço <input id="doadorEndereco" required minlength="5" maxlength="200" /></label>
+            <label>Categoria
+              <select id="doadorCategoria" required>
+                <option value="RESTAURANTE">Restaurante</option>
+                <option value="PADARIA">Padaria</option>
+                <option value="SUPERMERCADO">Supermercado</option>
+                <option value="FEIRA">Feira</option>
+                <option value="HOTEL">Hotel</option>
+                <option value="OUTRO">Outro</option>
+              </select>
+            </label>
+            <div class="dupla">
+              <label>Latitude <input id="doadorLat" type="number" step="0.0001" value="-23.4253" required /></label>
+              <label>Longitude <input id="doadorLon" type="number" step="0.0001" value="-51.9386" required /></label>
+            </div>
+            <button type="submit" class="botao botao--primario">Cadastrar doador</button>
+          </form>
+        </div>
+        <div class="painel">
+          <h2>Doadores cadastrados</h2>
+          <div id="listaDoadores"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ RECEPTORAS -->
+    <section class="secao" id="secao-receptoras">
+      <div class="grade">
+        <div class="painel">
+          <h2>Cadastrar organização receptora <small>(REQ02)</small></h2>
+          <form id="formReceptora" class="formulario">
+            <label>Nome <input id="receptoraNome" required minlength="3" maxlength="120" /></label>
+            <label>CNPJ <input id="receptoraCnpj" required minlength="14" maxlength="18" placeholder="00.000.000/0001-00" /></label>
+            <label>E-mail <input id="receptoraEmail" type="email" required /></label>
+            <label>Telefone <input id="receptoraTelefone" required minlength="8" maxlength="20" /></label>
+            <label>Endereço <input id="receptoraEndereco" required minlength="5" maxlength="200" /></label>
+            <label>Documentação comprobatória
+              <input id="receptoraDoc" required minlength="3" maxlength="200" placeholder="Ex.: Certificado OSCIP 1120/2023" />
+            </label>
+            <div class="dupla">
+              <label>Capacidade (pessoas) <input id="receptoraCapacidade" type="number" min="1" value="100" required /></label>
+              <label>Raio de atuação (km) <input id="receptoraRaio" type="number" step="0.5" min="0.5" value="8" required /></label>
+            </div>
+            <div class="dupla">
+              <label>Latitude <input id="receptoraLat" type="number" step="0.0001" value="-23.4300" required /></label>
+              <label>Longitude <input id="receptoraLon" type="number" step="0.0001" value="-51.9450" required /></label>
+            </div>
+            <button type="submit" class="botao botao--primario">Cadastrar organização</button>
+          </form>
+        </div>
+        <div class="painel">
+          <h2>Organizações cadastradas <small>(REQ03 — validação)</small></h2>
+          <div id="listaReceptoras"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ NOTIFICACOES -->
+    <section class="secao" id="secao-notificacoes">
+      <div class="painel">
+        <h2>Notificações enviadas <small>(REQ06)</small></h2>
+        <p class="ajuda">
+          Geradas automaticamente a cada nova doação publicada, para toda organização
+          <strong>validada</strong> cujo raio de atuação alcança o ponto de retirada.
+        </p>
+        <div id="listaNotificacoes"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="aviso" class="aviso" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
