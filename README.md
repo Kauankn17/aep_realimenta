@@ -40,7 +40,6 @@ REQ10 — O sistema deve permitir ao doador visualizar e atualizar os dados de u
 | 03/11/2026 | Regras de negócio: validação, notificação e priorização | Equipe |
 | 10/11/2026 | Interface gráfica, testes end-to-end e documentação final | Equipe |
 
-> Preencher a coluna **Responsável** com o nome de cada integrante antes da entrega.
 
 ---
 
